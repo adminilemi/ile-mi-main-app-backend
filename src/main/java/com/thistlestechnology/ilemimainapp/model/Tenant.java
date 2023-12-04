@@ -1,14 +1,21 @@
 package com.thistlestechnology.ilemimainapp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
 @Document(collection = "tenants")
-@Data
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Tenant {
+    @Id
+    private String id;
+    private String firstName;
+    private String lastName;
+    @DBRef
+    private AppUser appUser;
 }

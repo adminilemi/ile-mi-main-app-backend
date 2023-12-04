@@ -1,25 +1,22 @@
 package com.thistlestechnology.ilemimainapp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
 @Document(collection = "agents")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Getter
+@Setter
 public class Agent {
+    @Id
     private String id;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String email;
-    private String password;
     private String officeAddress;
     private String homeAddress;
     private String NIN;
@@ -27,7 +24,5 @@ public class Agent {
     private String localGovt;
     private String country;
     @DBRef
-    private ConfirmationToken confirmationToken;
-    private boolean isEnabled = false;
-
+    private AppUser appUser;
 }

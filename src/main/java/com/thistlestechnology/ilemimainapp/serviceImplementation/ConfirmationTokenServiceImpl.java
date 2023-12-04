@@ -1,46 +1,67 @@
 package com.thistlestechnology.ilemimainapp.serviceImplementation;
 
+import com.thistlestechnology.ilemimainapp.model.AppUser;
 import com.thistlestechnology.ilemimainapp.model.ConfirmationToken;
+import com.thistlestechnology.ilemimainapp.repository.AppUserRepository;
 import com.thistlestechnology.ilemimainapp.repository.ConfirmationTokenRepository;
 import com.thistlestechnology.ilemimainapp.service.ConfirmTokenService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class ConfirmationTokenServiceImpl implements ConfirmTokenService {
-
     private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final AppUserRepository appUserRepository;
 
     @Override
-    public void saveConfirmationToken(ConfirmationToken confirmationToken) {
+    public String generateAndSaveToken(String email) {
+        ConfirmationToken existingConfirmationToken =
+                confirmationTokenRepository.findConfirmationTokenByUserEmail(email);
+        if(existingConfirmationToken != null)
+            confirmationTokenRepository.delete(existingConfirmationToken);
+        String token = generateToken();
+        ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                .token(token)
+                .userEmail(email)
+                .createdAt(LocalDateTime.now())
+                .expiredAt(LocalDateTime.now().plusMinutes(10L))
+                .build();
         confirmationTokenRepository.save(confirmationToken);
+        return token;
+    }
+
+    private String generateToken() {
+        SecureRandom secureRandom = new SecureRandom();
+        return String.valueOf(secureRandom.nextInt(1000, 10000));
     }
 
     @Override
-    public Optional<ConfirmationToken> getConfirmationToken(String token) {
-        return confirmationTokenRepository.findByToken(token);
+    public ConfirmationToken validateToken( String token) {
+        ConfirmationToken confirmationToken =
+                confirmationTokenRepository.findConfirmationTokenByToken(token);
+     if(confirmationToken == null)
+         throw new IllegalStateException("Invalid token received");
+     else if(confirmationToken.getExpiredAt().isBefore(LocalDateTime.now()))
+         throw new IllegalStateException("Token has expired");
+     return confirmationToken;
     }
 
     @Override
     public void deleteConfirmationToken() {
-        confirmationTokenRepository.deleteTokenByExpiredAtBefore(LocalDateTime.now());
+        confirmationTokenRepository.deleteConfirmationTokensByExpiredAtBefore(LocalDateTime.now());
     }
 
     @Override
-    public void setExpiredAt(String token) {
-        confirmationTokenRepository.setExpiredAt(LocalDateTime.now(),token);
-    }
+    public void deleteConfirmationTokenOnVerification(ConfirmationToken token) {
+        AppUser foundUser = appUserRepository.findByEmail(token.getUserEmail());
+        if (foundUser.isVerified()){
+            confirmationTokenRepository.delete(token);
+        }
 
-    @Override
-    public ConfirmationToken findConfirmationTokenByToken(String token) {
-        return confirmationTokenRepository.findByToken(token).orElseThrow(()->new RuntimeException("token not found"));
     }
-
 }

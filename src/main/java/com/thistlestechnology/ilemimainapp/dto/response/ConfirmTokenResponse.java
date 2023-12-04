@@ -1,9 +1,10 @@
 package com.thistlestechnology.ilemimainapp.dto.response;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 @Getter
-public class LoginAgentResponse {
+public class ConfirmTokenResponse {
     private String message;
 }
