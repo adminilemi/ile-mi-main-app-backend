@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AgentRegisterResponse {
+    private String token;
     private String agentId;
     private String message;
 

@@ -36,7 +36,8 @@ public class JwtService {
     public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
-                .setSigningKey(secretKey)
+//                .setSigningKey(secretKey)
+                .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -61,8 +62,7 @@ public class JwtService {
                 .signWith(signKey, SignatureAlgorithm.HS256)
                 .compact();
     }
-    public String generateTokenForResetToken(
-            Map<String, Object> extraClaims,
+    public String generateTokenForResetToken(Map<String, Object> extraClaims,
             UserDetails userDetails){
 
         Set<String> roles =  userDetails.getAuthorities()
@@ -95,5 +95,4 @@ public class JwtService {
     private boolean isTokenExpired(String token) {
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }
-
 }

@@ -52,6 +52,11 @@ public class ConfirmationTokenServiceImpl implements ConfirmTokenService {
     }
 
     @Override
+    public ConfirmationToken getConfirmationToken(String token) {
+        return confirmationTokenRepository.findConfirmationTokenByToken(token);
+    }
+
+    @Override
     public void deleteConfirmationToken() {
         confirmationTokenRepository.deleteConfirmationTokensByExpiredAtBefore(LocalDateTime.now());
     }

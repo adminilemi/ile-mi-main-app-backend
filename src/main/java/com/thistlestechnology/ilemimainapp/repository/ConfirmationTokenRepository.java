@@ -38,4 +38,5 @@ public interface ConfirmationTokenRepository extends MongoRepository<Confirmatio
 //    ConfirmationToken findByAppUser_EmailAndToken(String token, String email);
 
     ConfirmationToken findConfirmationTokenByUserEmail(String email);
+
 }

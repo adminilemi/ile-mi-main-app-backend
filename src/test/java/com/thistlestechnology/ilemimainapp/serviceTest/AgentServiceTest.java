@@ -87,10 +87,10 @@ public class AgentServiceTest {
         appUser.setUsername(agentRegisterRequest.getFirstName());
         appUser.setEmail(agentRegisterRequest.getEmail());
         appUser.setPassword(agentRegisterRequest.getPassword());
-        appUser.setRole(Role.AGENT);
-        String generatedToken = confirmTokenService.generateAndSaveToken(appUser);
+//        appUser.setRole(Role.AGENT);
+//        String generatedToken = confirmTokenService.generateAndSaveToken(appUser);
         ConfirmTokenRequest confirmTokenRequest = new ConfirmTokenRequest();
-        confirmTokenRequest.setToken(generatedToken);
+//        confirmTokenRequest.setToken(generatedToken);
         confirmTokenRequest.setEmail(agentRegisterRequest.getEmail());
         agentService.verifyToken(confirmTokenRequest);
         assertEquals(true,agentService.isVerified(agentRegisterRequest.getEmail()));

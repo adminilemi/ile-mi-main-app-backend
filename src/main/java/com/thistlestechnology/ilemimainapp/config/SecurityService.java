@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SecurityService {
     private  final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationProvider authenticationProvider;
     private final ProjectAuthenticationEntryPoint authenticationEntryPoint;
-    private final LogoutHandler logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,15 +39,12 @@ public class SecurityService {
                         .requestMatchers(WhiteList.swagger())
                         .permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("api/v1/agent/**").hasAuthority("AGENT")
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+//                        .requestMatchers("api/v1/agent/**").hasAuthority("AGENT")
+                        .requestMatchers("/api/v1/agent/**").permitAll()
+                        .requestMatchers("/api/v1/user/**").permitAll()
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout ->
-                        logout.logoutUrl("/user/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 .build();
 
 

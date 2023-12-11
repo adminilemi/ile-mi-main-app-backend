@@ -15,7 +15,10 @@ import com.thistlestechnology.ilemimainapp.service.AgentService;
 import com.thistlestechnology.ilemimainapp.service.AppUserService;
 import com.thistlestechnology.ilemimainapp.service.ConfirmTokenService;
 import com.thistlestechnology.ilemimainapp.service.EmailService;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +37,7 @@ import java.util.Set;
 import static com.thistlestechnology.ilemimainapp.utils.EmailUtils.buildEmail;
 import static com.thistlestechnology.ilemimainapp.utils.EmailUtils.buildForgotPasswordEmail;
 
+@Data
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -66,6 +70,7 @@ public class AgentServiceImpl implements AgentService {
         String token = confirmTokenService.generateAndSaveToken(savedAppUser.getEmail());
         sendConfirmationToken(savedAgent.getFirstName(), savedAppUser.getEmail(), token);
         return AgentRegisterResponse.builder()
+                .token(token)
                 .agentId(savedAgent.getId())
                 .message("agent has been registered successfully,go to your email and confirm email")
                 .build();
@@ -81,24 +86,6 @@ public class AgentServiceImpl implements AgentService {
         EmailRequest emailRequest = new EmailRequest();
         emailRequest.setMessage(buildEmail(firstName, token));
         emailRequest.setReceiver(email);
-    }
-
-//    private boolean agentExistsByEmail(String email){
-//        List<Agent> agents = agentRepository.findAll();
-//        for(Agent agent : agents){
-//            if(agent.getAppUser().getEmail().equals(email))
-//                return true;
-//        }
-//        return false;
-//    }
-
-    private Agent getAgentByEmail(String email){
-        List<Agent> agents = agentRepository.findAll();
-        for(Agent agent : agents){
-            if(agent.getAppUser().getEmail().equals(email))
-                return agent;
-        }
-        throw new IllegalStateException("Agent not found");
     }
 
     @Override
@@ -136,7 +123,7 @@ public class AgentServiceImpl implements AgentService {
 
 
     @Override
-    public LoginAgentResponse loginAgent(LoginAgentRequest loginAgentRequest) {;
+    public LoginAgentResponse loginAgent(LoginAgentRequest loginAgentRequest) {
        AppUser foundAppUser = appUserRepository.findByEmail(loginAgentRequest.getEmail());
         if (!passwordEncoder.matches(loginAgentRequest.getPassword(), foundAppUser.getPassword())){
             throw new PasswordMismatchException("incorrect password");
@@ -150,7 +137,8 @@ public class AgentServiceImpl implements AgentService {
         UserDetails userDetails = securedUserService.loadUserByUsername(loginAgentRequest.getEmail());
         String token = jwtService.generateToken(userDetails);
         return LoginAgentResponse.builder()
-             .message("Bearer "+token)
+             .message("login successful")
+                .bearerToken("Bearer" + token)
                 .build();
 
     }

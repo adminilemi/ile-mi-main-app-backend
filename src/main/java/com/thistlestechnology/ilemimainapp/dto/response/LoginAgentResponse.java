@@ -6,4 +6,5 @@ import lombok.*;
 @Getter
 public class LoginAgentResponse {
     private String message;
+    private String bearerToken;
 }
